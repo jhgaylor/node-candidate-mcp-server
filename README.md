@@ -166,15 +166,8 @@ app.listen(PORT, () => {
 For demonstration purposes only, the following methods are provided:
 
 ```bash
-# Start with HTTP server (demo only)
+# Start with STDIO (demo only)
 npm start
-```
-
-The server will be available at http://localhost:3000/mcp
-
-```bash
-# Start with STDIO (for CLI tools, demo only)
-npm start -- --stdio
 ```
 
 When running with STDIO, you can interact with the server by sending MCP messages as single-line JSON objects:
