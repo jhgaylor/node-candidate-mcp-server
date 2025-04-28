@@ -4,12 +4,6 @@ A Model Context Protocol (MCP) server that gives LLMs access to information abou
 
 ## Overview
 
-This MCP server provides resources about a candidate, including:
-- Resume information
-- LinkedIn profile
-- GitHub profile
-- Personal website
-
 > **Important**: This server is intended to be used as a library to be integrated into other applications, not as a standalone service. The provided startup methods are for demonstration and testing purposes only.
 
 ### Resources
