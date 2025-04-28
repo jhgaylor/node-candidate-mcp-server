@@ -19,11 +19,11 @@ This MCP server provides the following resources:
 
 ## Usage
 
-`npm install node-candidate-mcp-server`
+`npm install @jhgaylor/candidate-mcp-server`
 
 ### Library Usage
 
-This package is designed to be imported and used within your own applications:
+This package is designed to be imported and used within your own applications.
 
 #### Stdio
 
@@ -32,7 +32,7 @@ Starting the process is a breeze with stdio. The interesting part is providing t
 Where you source the candidate configuration is entirely up to you. Maybe you hard code it. Maybe you take a JSONResume url when you start the process. It's up to you!
 
 ```javascript
-import { createServer } from 'node-candidate-mcp-server';
+import { createServer } from '@jhgaylor/candidate-mcp-server';
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
 // Configure your server
@@ -58,7 +58,7 @@ Using the example code provided by the typescript sdk we can bind this mcp serve
 ```javascript
 import express from 'express';
 import { Request, Response } from 'express';
-import { createServer } from 'node-candidate-mcp-server';
+import { createServer } from '@jhgaylor/candidate-mcp-server';
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamablehttp.js";
 
 // Configure your server
@@ -280,7 +280,7 @@ curl -X POST http://your-application-url/mcp \
 This library is designed to be extended with custom resources, tools, and prompts. Here's how to add your own resources:
 
 ```javascript
-import { McpServer, Resource } from 'node-candidate-mcp-server';
+import { McpServer, Resource } from '@jhgaylor/candidate-mcp-server';
 
 // Create your custom resource class
 class CustomCandidateResource extends Resource {
