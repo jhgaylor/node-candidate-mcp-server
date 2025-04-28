@@ -1,0 +1,171 @@
+---
+description: 
+globs: *.ts
+alwaysApply: false
+---
+ # MCP TypeScript SDK
+
+MCP TypeScript SDK implements the full Model Context Protocol specification, allowing you to build MCP servers and clients using TypeScript.
+
+## Installation
+
+```bash
+npm install @modelcontextprotocol/sdk --save
+# or
+yarn add @modelcontextprotocol/sdk
+```
+
+## Quickstart: Create an MCP Server
+
+```typescript
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { z } from "zod";
+
+const server = new McpServer({ name: "DemoServer", version: "1.0.0" });
+
+// Define a simple addition tool
+type AddParams = { a: number; b: number };
+server.tool(
+  "add",
+  { a: z.number(), b: z.number() },
+  async ({ a, b }: AddParams) => ({ content: [{ type: "text", text: `${a + b}` }] })
+);
+
+// Start listening on stdin/stdout transport
+await server.connect(new StdioServerTransport());
+```
+
+## Core Concepts
+
+- **McpServer**: entry point for protocol compliance, message routing, and lifecycle management.
+- **Resources**: read-only data endpoints via `server.resource(name, template, handler)` and `ResourceTemplate`.
+- **Tools**: action endpoints via `server.tool(name, schema, executor)`.
+- **Prompts**: reusable message templates via `server.prompt(name, schema, builder)`.
+- **Transports**: connect servers/clients over stdio, HTTP, SSE, or Streamable HTTP (`StdioServerTransport`, `StreamableHttpServerTransport`, etc.).
+
+## Preferred Transport: Streamable HTTP
+
+Streamable HTTP is the recommended transport for production environments, offering full-duplex streaming, session management, and backward compatibility over older SSE-based transports.
+
+### Streamable HTTP Server Example
+
+```typescript
+import express from "express";
+import { randomUUID } from "crypto";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
+
+const app = express();
+app.use(express.json());
+
+const server = new McpServer({ name: "StreamableExample", version: "1.0.0" });
+const transports: Record<string, StreamableHTTPServerTransport> = {};
+
+app.post('/mcp', async (req, res) => {
+  const sid = req.headers['mcp-session-id'] as string | undefined;
+  let transport: StreamableHTTPServerTransport;
+
+  if (sid && transports[sid]) {
+    transport = transports[sid];
+  } else if (!sid && isInitializeRequest(req.body)) {
+    transport = new StreamableHTTPServerTransport({
+      sessionIdGenerator: () => randomUUID(),
+      onsessioninitialized: (sessionId) => (transports[sessionId] = transport)
+    });
+    transport.onclose = () => delete transports[transport.sessionId!];
+  } else {
+    res.status(400).send("Invalid request");
+    return;
+  }
+
+  await server.connect(transport);
+  transport.handleRequest(req, res);
+});
+
+const PORT = process.env.PORT ?? 3000;
+app.listen(PORT, () => console.log(`MCP Streamable HTTP server listening on ${PORT}`));
+```
+
+## Examples
+
+## Examples
+
+### Echo Server
+
+```typescript
+import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
+
+const server = new McpServer({ name: "Echo", version: "1.0.0" });
+
+server.resource(
+  "echo",
+  new ResourceTemplate("echo://{message}", { list: undefined }),
+  async (uri, { message }) => ({ contents: [{ uri: uri.href, text: `Resource echo: ${message}` }] })
+);
+
+server.tool(
+  "echo",
+  { message: z.string() },
+  async ({ message }) => ({ content: [{ type: "text", text: `Tool echo: ${message}` }] })
+);
+
+server.prompt(
+  "echo",
+  { message: z.string() },
+  ({ message }) => ({ messages: [{ role: "user", content: { type: "text", text: `Please process: ${message}` } }] })
+);
+```
+
+### SQLite Explorer
+
+```typescript
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import sqlite3 from "sqlite3";
+import { promisify } from "util";
+import { z } from "zod";
+
+const server = new McpServer({ name: "SQLiteExplorer", version: "1.0.0" });
+const db = new sqlite3.Database("data.db");
+const allAsync = promisify(db.all.bind(db));
+
+server.resource(
+  "tables",
+  "sqlite://tables",
+  async () => {
+    const rows = await allAsync(`SELECT name FROM sqlite_master WHERE type='table'`);
+    return { contents: rows.map(r => ({ uri: `sqlite://table/${r.name}`, text: r.name })) };
+  }
+);
+```
+
+## Quickstart: Create an MCP Client
+
+```typescript
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+
+const client = new Client({ name: "DemoClient", version: "1.0.0" });
+await client.connect(new StdioClientTransport());
+
+// List available tools and call one
+const tools = await client.listTools();
+const result = await client.callTool({ toolName: tools[0].name, args: { message: "Hi" } });
+console.log(result);
+```
+
+## Testing & Debugging
+
+- Use the [MCP Inspector](mdc:https:/github.com/modelcontextprotocol/inspector) for interactive protocol testing.
+- Add logging or use `server.on('message', ...)` and `client.on('message', ...)` for low-level tracing.
+
+## Best Practices
+
+- Always specify `name` and `version` in server/client metadata.
+- Validate inputs with **zod** schemas for safety.
+- Emit **progress** or **cancellation** updates for long-running tasks.
+- Choose appropriate transport: stdio for CLI, Streamable HTTP for web services.
+- Keep resource handlers idempotent and side-effect-free.
+- Review official docs: https://modelcontextprotocol.io/sdk/typescript

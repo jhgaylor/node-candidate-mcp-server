@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  # MCP Time Server with HTTP transport
+  mcp-time-http:
+    build:
+      context: .
+    ports:
+      - "3000:3000"
+    command: ["node", "dist/index.js", "--transport=http", "--port=3000"]
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./dist:/app/dist
+
+  # MCP Time Server with stdio transport (default)
+  mcp-time-stdio:
+    build:
+      context: .
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./dist:/app/dist
+    # Use default command (npm start) 
