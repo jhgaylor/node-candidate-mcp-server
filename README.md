@@ -12,6 +12,17 @@ This MCP server provides resources about a candidate, including:
 
 > **Important**: This server is intended to be used as a library to be integrated into other applications, not as a standalone service. The provided startup methods are for demonstration and testing purposes only.
 
+### Resources
+
+This MCP server provides the following resources:
+
+- `candidate-info://resume-text`: Resume content as text
+- `candidate-info://resume-url`: URL to the resume
+- `candidate-info://linkedin-url`: LinkedIn profile URL
+- `candidate-info://github-url`: GitHub profile URL
+- `candidate-info://website-url`: Personal website URL
+- `candidate-info://website-text`: Content from the personal website
+
 ## Usage
 
 `npm install node-candidate-mcp-server`
@@ -194,17 +205,6 @@ npm run build
 # Run in development mode with auto-restart
 npm run dev
 ```
-
-## Resources
-
-This MCP server provides the following resources:
-
-- `candidate-info://resume-text`: Resume content as text
-- `candidate-info://resume-url`: URL to the resume
-- `candidate-info://linkedin-url`: LinkedIn profile URL
-- `candidate-info://github-url`: GitHub profile URL
-- `candidate-info://website-url`: Personal website URL
-- `candidate-info://website-text`: Content from the personal website
 
 ## Features
 
