@@ -166,9 +166,20 @@ app.listen(PORT, () => {
 });
 ```
 
-### Demo Startup Methods
+## Development 
 
-For demonstration purposes only, the following methods are provided:
+```bash
+# Install dependencies
+npm install
+
+# Build the project
+npm run build
+
+# Run in development mode with auto-restart
+npm run dev
+```
+
+### Demo / Debug Startup via stdio
 
 ```bash
 # Start with STDIO (demo only)
@@ -189,19 +200,6 @@ echo '{"jsonrpc": "2.0","id": 3,"method": "resources/read","params": {"uri": "ca
 ```
 
 Each message must be on a single line with no line breaks within the JSON object.
-
-## Development 
-
-```bash
-# Install dependencies
-npm install
-
-# Build the project
-npm run build
-
-# Run in development mode with auto-restart
-npm run dev
-```
 
 ## Features
 
