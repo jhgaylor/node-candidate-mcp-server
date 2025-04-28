@@ -12,27 +12,23 @@ This MCP server provides resources about a candidate, including:
 
 > **Important**: This server is intended to be used as a library to be integrated into other applications, not as a standalone service. The provided startup methods are for demonstration and testing purposes only.
 
-## Installation
-
-```bash
-# Install dependencies
-npm install
-
-# Build the project
-npm run build
-```
-
 ## Usage
+
+`npm install node-candidate-mcp-server`
 
 ### Library Usage
 
 This package is designed to be imported and used within your own applications:
 
+#### Stdio
+
+Starting the process is a breeze with stdio. The interesting part is providing the candidate configuration.
+
+Where you source the candidate configuration is entirely up to you. Maybe you hard code it. Maybe you take a JSONResume url when you start the process. It's up to you!
+
 ```javascript
 import { createServer } from 'node-candidate-mcp-server';
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-// or
-import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 
 // Configure your server
 const serverConfig = { name: "MyCandidateServer", version: "1.0.0" };
@@ -48,6 +44,121 @@ const server = createServer(serverConfig, candidateConfig);
 // Connect with your preferred transport
 await server.connect(new StdioServerTransport());
 // or integrate with your existing HTTP server
+```
+
+#### StreamableHttp
+
+Using the example code provided by the typescript sdk we can bind this mcp server to an express server.
+
+```javascript
+import express from 'express';
+import { Request, Response } from 'express';
+import { createServer } from 'node-candidate-mcp-server';
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamablehttp.js";
+
+// Configure your server
+const serverConfig = { name: "MyCandidateServer", version: "1.0.0" };
+const candidateConfig = { 
+  name: "John Doe",
+  resumeUrl: "https://example.com/resume.pdf",
+  // other candidate properties
+};
+
+// Factory function to create a new server instance for each request
+const getServer = () => createServer(serverConfig, candidateConfig);
+
+const app = express();
+app.use(express.json());
+
+app.post('/mcp', async (req: Request, res: Response) => {
+  // In stateless mode, create a new instance of transport and server for each request
+  // to ensure complete isolation. A single instance would cause request ID collisions
+  // when multiple clients connect concurrently.
+  
+  try {
+    const server = getServer(); 
+    const transport = new StreamableHTTPServerTransport({
+      sessionIdGenerator: undefined,
+    });
+    res.on('close', () => {
+      console.log('Request closed');
+      transport.close();
+      server.close();
+    });
+    await server.connect(transport);
+    await transport.handleRequest(req, res, req.body);
+  } catch (error) {
+    console.error('Error handling MCP request:', error);
+    if (!res.headersSent) {
+      res.status(500).json({
+        jsonrpc: '2.0',
+        error: {
+          code: -32603,
+          message: 'Internal server error',
+        },
+        id: null,
+      });
+    }
+  }
+});
+
+app.get('/mcp', async (req: Request, res: Response) => {
+  console.log('Received GET MCP request');
+  res.writeHead(405).end(JSON.stringify({
+    jsonrpc: "2.0",
+    error: {
+      code: -32000,
+      message: "Method not allowed."
+    },
+    id: null
+  }));
+});
+
+app.delete('/mcp', async (req: Request, res: Response) => {
+  console.log('Received DELETE MCP request');
+  res.writeHead(405).end(JSON.stringify({
+    jsonrpc: "2.0",
+    error: {
+      code: -32000,
+      message: "Method not allowed."
+    },
+    id: null
+  }));
+});
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`MCP Stateless Streamable HTTP Server listening on port ${PORT}`);
+});
+```
+
+#### Express
+
+Instead of writing the binding between express and the mcp transport yourself, you can use `express-mcp-handler` to do it for you.
+
+`npm install express-mcp-handler`
+
+```javascript
+import express from 'express';
+import { statelessHandler } from 'express-mcp-handler';
+import { createServer } from './server';
+
+// Configure the stateless handler
+const handler = statelessHandler(createServer);
+
+// Create Express app
+const app = express();
+app.use(express.json());
+
+// Mount the handler (stateless only needs POST)
+app.post('/mcp', handler);
+
+// Start the server
+const PORT = process.env.PORT || 3002;
+app.listen(PORT, () => {
+  console.log(`Stateless MCP server running on port ${PORT}`);
+});
 ```
 
 ### Demo Startup Methods
@@ -78,19 +189,15 @@ echo '{"jsonrpc": "2.0","id": 2,"method": "resources/read","params": {"uri": "ca
 
 Each message must be on a single line with no line breaks within the JSON object.
 
-## Configuration
-
-The candidate information can be configured through environment variables:
-
-- `CANDIDATE_NAME`: Candidate's full name
-- `RESUME_URL`: URL to candidate's resume
-- `LINKEDIN_URL`: URL to candidate's LinkedIn profile
-- `GITHUB_URL`: URL to candidate's GitHub profile
-- `WEBSITE_URL`: URL to candidate's personal website
-
-## Development
+## Development 
 
 ```bash
+# Install dependencies
+npm install
+
+# Build the project
+npm run build
+
 # Run in development mode with auto-restart
 npm run dev
 ```
@@ -105,14 +212,6 @@ This MCP server provides the following resources:
 - `candidate-info://github-url`: GitHub profile URL
 - `candidate-info://website-url`: Personal website URL
 - `candidate-info://website-text`: Content from the personal website
-
-## Tools
-
-- `contact_candidate`: Send a message to the candidate
-
-## Prompts
-
-- `Job Search for [Candidate Name]`: Generate a job search prompt tailored to the candidate's profile
 
 ## Features
 
