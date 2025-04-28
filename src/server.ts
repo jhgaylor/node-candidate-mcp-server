@@ -10,7 +10,10 @@ function createServer(
 
   const server = new McpServer({
     name: serverConfig.name,
-    version: serverConfig.version
+    version: serverConfig.version,
+    capabilities: {
+      resources: {},
+    }
   });
 
   // Bind all available candidate resources based on candidate configuration

@@ -181,8 +181,11 @@ When running with STDIO, you can interact with the server by sending MCP message
 # Example of sending an initialize message via STDIO
 echo '{"jsonrpc": "2.0","id": 1,"method": "initialize","params": {"protocolVersion": "2024-11-05","capabilities": {"roots": {"listChanged": true},"sampling": {}},"clientInfo": {"name": "ExampleClient","version": "1.0.0"}}}' | node dist/index.js --stdio
 
+# List resources
+echo '{"jsonrpc": "2.0","id": 2,"method": "resources/list","params": {}}' | node dist/index.js --stdio
+
 # Access a resource
-echo '{"jsonrpc": "2.0","id": 2,"method": "resources/read","params": {"uri": "candidate-info://resume-text"}}' | node dist/index.js --stdio
+echo '{"jsonrpc": "2.0","id": 3,"method": "resources/read","params": {"uri": "candidate-info://resume-text"}}' | node dist/index.js --stdio
 ```
 
 Each message must be on a single line with no line breaks within the JSON object.
@@ -318,4 +321,22 @@ customResource.bind(server);
 
 ## License
 
-[ISC](LICENSE) 
+[MIT](LICENSE) 
+
+## Publishing to npm
+
+Log in to npm if you haven't already:
+```bash
+npm login
+```
+
+Publish the package to npm (will run your prepublishOnly build):
+```bash
+npm publish
+```
+
+To bump, tag, and push a new version:
+```bash
+npm version patch    # or minor, major
+git push origin main --tags
+```
