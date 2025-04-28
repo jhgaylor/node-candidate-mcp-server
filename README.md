@@ -1,4 +1,4 @@
-# Candidate MCP Server
+# Candidate MCP Server Library
 
 A Model Context Protocol (MCP) server that gives LLMs access to information about a candidate.
 
