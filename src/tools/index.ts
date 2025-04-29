@@ -1,9 +1,23 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { CandidateConfig } from "../config";
+import { CandidateConfig, ServerConfig } from "../config";
+// Using nodemailer with mailgun transport
+import * as nodemailer from 'nodemailer';
+import * as mailGun from 'nodemailer-mailgun-transport';
 
-function candidateTools(candidateConfig: CandidateConfig) {
-  return {
+// Define a type for the tools collection
+interface ToolCollection {
+  GetResumeText: GetResumeText;
+  GetResumeUrl: GetResumeUrl;
+  GetLinkedinUrl: GetLinkedinUrl;
+  GetGithubUrl: GetGithubUrl;
+  GetWebsiteUrl: GetWebsiteUrl;
+  GetWebsiteText: GetWebsiteText;
+  ContactCandidate?: ContactCandidate;
+}
+
+function candidateTools(candidateConfig: CandidateConfig, serverConfig: ServerConfig): ToolCollection {
+  const tools: ToolCollection = {
     GetResumeText: new GetResumeText(candidateConfig),
     GetResumeUrl: new GetResumeUrl(candidateConfig),
     GetLinkedinUrl: new GetLinkedinUrl(candidateConfig),
@@ -11,6 +25,10 @@ function candidateTools(candidateConfig: CandidateConfig) {
     GetWebsiteUrl: new GetWebsiteUrl(candidateConfig),
     GetWebsiteText: new GetWebsiteText(candidateConfig),
   };
+  
+  tools.ContactCandidate = new ContactCandidate(candidateConfig, serverConfig);
+  
+  return tools;
 }
 
 class Tool {
@@ -37,6 +55,55 @@ class Tool {
       this.description,
       this.schema,
       this.executor,
+    );
+  }
+}
+
+class ContactCandidate extends Tool {
+  constructor(candidateConfig: CandidateConfig, serverConfig: ServerConfig) {
+    super(
+      "contact_candidate",
+      `Send an email to the candidate ${candidateConfig.name}`,
+      {
+        subject: z.string().describe("Email subject line"),
+        message: z.string().describe("Email message body"),
+        reply_address: z.string().describe("Email address where the candidate can reply")
+      },
+      async (args, _extra) => {
+        try {
+          const auth = {
+            auth: {
+              api_key: serverConfig.mailgunApiKey!,
+              domain: serverConfig.mailgunDomain!
+            }
+          };
+
+          const transporter = nodemailer.createTransport(mailGun(auth));
+          
+          const mailOptions = {
+            from: `AI Assistant <ai-assistant@${serverConfig.mailgunDomain}>`,
+            to: serverConfig.contactEmail!,
+            subject: args.subject,
+            text: args.message,
+            replyTo: args.reply_address
+          };
+          
+          await transporter.sendMail(mailOptions);
+          
+          return {
+            content: [
+              { type: "text", text: `Email successfully sent to ${candidateConfig.name} at ${serverConfig.contactEmail}` }
+            ]
+          };
+        } catch (error) {
+          console.error("Failed to send email:", error);
+          return {
+            content: [
+              { type: "text", text: `Failed to send email: ${error instanceof Error ? error.message : String(error)}` }
+            ]
+          };
+        }
+      }
     );
   }
 }

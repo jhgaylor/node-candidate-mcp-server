@@ -1,3 +1,7 @@
+# 1.2.0
+
+- Add the ability to contact the candidate via email
+
 # 1.1.2
 
 - Put the candidates name in the tool descriptions

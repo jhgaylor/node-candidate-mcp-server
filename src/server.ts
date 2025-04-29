@@ -16,7 +16,7 @@ function createServer(
 
   // Bind all available candidate tools + resources based on candidate configuration
   const resourceInstances = candidateResources(candidateConfig);
-  const toolInstances = candidateTools(candidateConfig);
+  const toolInstances = candidateTools(candidateConfig, serverConfig);
   
   if (candidateConfig.resumeText) {
     resourceInstances.ResumeText.bind(server);
@@ -46,6 +46,11 @@ function createServer(
   if (candidateConfig.websiteText) {
     resourceInstances.WebsiteText.bind(server);
     toolInstances.GetWebsiteText.bind(server);
+  }
+  
+  // Conditionally bind ContactCandidate tool if email and Mailgun config are available
+  if (serverConfig.contactEmail && serverConfig.mailgunApiKey && serverConfig.mailgunDomain) {
+    toolInstances.ContactCandidate?.bind(server);
   }
 
   return server;

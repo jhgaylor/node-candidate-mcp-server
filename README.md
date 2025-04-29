@@ -27,6 +27,7 @@ This MCP server also provides tools that return the same candidate information:
 - `get_github_url`: Returns the candidate's GitHub profile URL
 - `get_website_url`: Returns the candidate's personal website URL
 - `get_website_text`: Returns the content from the candidate's personal website
+- `contact_candidate`: Sends an email to the candidate (requires Mailgun configuration)
 
 ## Usage
 
@@ -47,9 +48,15 @@ import { createServer } from '@jhgaylor/candidate-mcp-server';
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
 // Configure your server
-const serverConfig = { name: "MyCandidateServer", version: "1.0.0" };
+const serverConfig = { 
+  name: "MyCandidateServer", 
+  version: "1.0.0",
+  mailgunApiKey: process.env.MAILGUN_API_KEY,
+  mailgunDomain: process.env.MAILGUN_DOMAIN
+};
 const candidateConfig = { 
   name: "John Doe",
+  email: "john.doe@example.com", // Required for the contact_candidate tool
   resumeUrl: "https://example.com/resume.pdf",
   // other candidate properties
 };
@@ -73,7 +80,13 @@ import { createServer } from '@jhgaylor/candidate-mcp-server';
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamablehttp.js";
 
 // Configure your server
-const serverConfig = { name: "MyCandidateServer", version: "1.0.0" };
+const serverConfig = { 
+  name: "MyCandidateServer", 
+  version: "1.0.0",
+  mailgunApiKey: process.env.MAILGUN_API_KEY,
+  mailgunDomain: process.env.MAILGUN_DOMAIN,
+  contactEmail: "john.doe@example.com",
+};
 const candidateConfig = { 
   name: "John Doe",
   resumeUrl: "https://example.com/resume.pdf",
@@ -160,8 +173,26 @@ import express from 'express';
 import { statelessHandler } from 'express-mcp-handler';
 import { createServer } from './server';
 
+// You can configure the server factory to include Mailgun settings
+const createServerWithConfig = () => {
+  const serverConfig = { 
+    name: "MyCandidateServer", 
+    version: "1.0.0",
+    mailgunApiKey: process.env.MAILGUN_API_KEY,
+    mailgunDomain: process.env.MAILGUN_DOMAIN,
+    contactEmail: "john.doe@example.com",
+  };
+  const candidateConfig = { 
+    name: "John Doe",
+    resumeUrl: "https://example.com/resume.pdf",
+    // other candidate properties
+  };
+  
+  return createServer(serverConfig, candidateConfig);
+};
+
 // Configure the stateless handler
-const handler = statelessHandler(createServer);
+const handler = statelessHandler(createServerWithConfig);
 
 // Create Express app
 const app = express();
@@ -214,6 +245,9 @@ echo '{"jsonrpc": "2.0","id": 2,"method": "tools/list","params": {}}' | node dis
 
 # Call a tool
 echo '{"jsonrpc": "2.0","id": 4,"method": "tools/call","params": {"name": "get_resume_text", "args": {}}}' | node dist/index.js --stdio
+
+# Send an email to the candidate
+echo '{"jsonrpc": "2.0","id": 5,"method": "tools/call","params": {"name": "contact_candidate", "args": {"subject": "Hello from AI!", "message": "This is a test email sent via the MCP server.", "reply_address": "recruiter@company.com"}}}' | node dist/index.js --stdio
 ```
 
 Each message must be on a single line with no line breaks within the JSON object.

@@ -1,6 +1,6 @@
 {
   "name": "@jhgaylor/candidate-mcp-server",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
@@ -21,7 +21,11 @@
   },
   "description": "A stateless Model Context Protocol (MCP) server built with Express and TypeScript that provides information about a candidate.",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0"
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@types/nodemailer": "^6.4.17",
+    "@types/nodemailer-mailgun-transport": "^1.4.6",
+    "nodemailer": "^6.10.1",
+    "nodemailer-mailgun-transport": "^2.1.5"
   },
   "devDependencies": {
     "@types/node": "^20.11.24",
