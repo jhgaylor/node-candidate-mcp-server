@@ -17,6 +17,17 @@ This MCP server provides the following resources:
 - `candidate-info://website-url`: Personal website URL
 - `candidate-info://website-text`: Content from the personal website
 
+### Tools
+
+This MCP server also provides tools that return the same candidate information:
+
+- `get_resume_text`: Returns the candidate's resume content as text
+- `get_resume_url`: Returns the URL to the candidate's resume
+- `get_linkedin_url`: Returns the candidate's LinkedIn profile URL
+- `get_github_url`: Returns the candidate's GitHub profile URL
+- `get_website_url`: Returns the candidate's personal website URL
+- `get_website_text`: Returns the content from the candidate's personal website
+
 ## Usage
 
 `npm install @jhgaylor/candidate-mcp-server`
@@ -197,6 +208,12 @@ echo '{"jsonrpc": "2.0","id": 2,"method": "resources/list","params": {}}' | node
 
 # Access a resource
 echo '{"jsonrpc": "2.0","id": 3,"method": "resources/read","params": {"uri": "candidate-info://resume-text"}}' | node dist/index.js --stdio
+
+# List Tools
+echo '{"jsonrpc": "2.0","id": 2,"method": "tools/list","params": {}}' | node dist/index.js --stdio
+
+# Call a tool
+echo '{"jsonrpc": "2.0","id": 4,"method": "tools/call","params": {"name": "get_resume_text", "args": {}}}' | node dist/index.js --stdio
 ```
 
 Each message must be on a single line with no line breaks within the JSON object.
@@ -307,6 +324,39 @@ const server = createServer(serverConfig, candidateConfig);
 // Add your custom resource
 const customResource = new CustomCandidateResource(candidateConfig);
 customResource.bind(server);
+
+// Connect with preferred transport
+// ...
+```
+
+### Adding Custom Tools
+
+You can also extend the library with custom tools:
+
+```javascript
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { z } from 'zod';
+import { createServer } from '@jhgaylor/candidate-mcp-server';
+
+// Create server with standard configuration
+const server = createServer(serverConfig, candidateConfig);
+
+// Add a custom tool
+server.tool(
+  'get_candidate_skills',
+  'Returns a list of the candidate skills',
+  {},
+  async (_args, _extra) => {
+    return {
+      content: [
+        { 
+          type: "text", 
+          text: "JavaScript, TypeScript, React, Node.js, MCP Protocol" 
+        }
+      ]
+    };
+  }
+);
 
 // Connect with preferred transport
 // ...
