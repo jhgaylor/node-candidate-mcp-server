@@ -1,3 +1,7 @@
+# 1.1.0
+
+- Add a set of tools that replicate the resources
+
 # 1.0.4
 
 - Don't explicity state capabilities

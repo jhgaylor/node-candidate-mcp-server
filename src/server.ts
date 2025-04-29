@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ServerConfig, CandidateConfig } from "./config";
 import { candidateResources } from "./resources";
+import { candidateTools } from "./tools";
 
 // Return a new instance of an MCP server
 function createServer(
@@ -13,31 +14,38 @@ function createServer(
     version: serverConfig.version,
   });
 
-  // Bind all available candidate resources based on candidate configuration
+  // Bind all available candidate tools + resources based on candidate configuration
   const resourceInstances = candidateResources(candidateConfig);
+  const toolInstances = candidateTools(candidateConfig);
   
   if (candidateConfig.resumeText) {
     resourceInstances.ResumeText.bind(server);
+    toolInstances.GetResumeText.bind(server);
   }
   
   if (candidateConfig.resumeUrl) {
     resourceInstances.ResumeUrl.bind(server);
+    toolInstances.GetResumeUrl.bind(server);
   }
   
   if (candidateConfig.linkedinUrl) {
     resourceInstances.LinkedinUrl.bind(server);
+    toolInstances.GetLinkedinUrl.bind(server);
   }
   
   if (candidateConfig.githubUrl) {
     resourceInstances.GithubUrl.bind(server);
+    toolInstances.GetGithubUrl.bind(server);
   }
   
   if (candidateConfig.websiteUrl) {
     resourceInstances.WebsiteUrl.bind(server);
+    toolInstances.GetWebsiteUrl.bind(server);
   }
   
   if (candidateConfig.websiteText) {
     resourceInstances.WebsiteText.bind(server);
+    toolInstances.GetWebsiteText.bind(server);
   }
 
   return server;
