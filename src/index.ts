@@ -33,3 +33,5 @@ Skills:
 }
 
 startServer();
+
+export { createServer };
