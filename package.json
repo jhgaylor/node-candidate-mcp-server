@@ -1,10 +1,10 @@
 {
   "name": "@jhgaylor/candidate-mcp-server",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node examples/stdio.js",
     "dev": "nodemon --watch src --ext ts --exec 'npm run build && npm start'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
