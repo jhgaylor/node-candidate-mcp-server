@@ -3,7 +3,7 @@ import { z } from "zod";
 import { CandidateConfig, ServerConfig } from "../config";
 // Using nodemailer with mailgun transport
 import * as nodemailer from 'nodemailer';
-import * as mailGun from 'nodemailer-mailgun-transport';
+import mailGun from 'nodemailer-mailgun-transport';
 
 // Define a type for the tools collection
 interface ToolCollection {
