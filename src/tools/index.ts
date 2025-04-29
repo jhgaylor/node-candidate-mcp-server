@@ -15,15 +15,18 @@ function candidateTools(candidateConfig: CandidateConfig) {
 
 class Tool {
   name: string;
+  description: string;
   schema: Record<string, z.ZodType>;
   executor: (args: Record<string, any>, extra: any) => Promise<{ content: Array<{ type: "text"; text: string }> }>;
 
   constructor(
     name: string, 
+    description: string,
     schema: Record<string, z.ZodType>,
     executor: (args: Record<string, any>, extra: any) => Promise<{ content: Array<{ type: "text"; text: string }> }>
   ) {
     this.name = name;
+    this.description = description;
     this.schema = schema;
     this.executor = executor;
   }
@@ -31,6 +34,7 @@ class Tool {
   bind(server: McpServer) {
     return server.tool(
       this.name,
+      this.description,
       this.schema,
       this.executor,
     );
@@ -41,6 +45,7 @@ class GetResumeText extends Tool {
   constructor(candidateConfig: CandidateConfig) {
     super(
       `get_resume_text`,
+      `Get the resume text of the candidate ${candidateConfig.name}`,
       {},
       async (_args, _extra) => {
         return {
@@ -57,6 +62,7 @@ class GetResumeUrl extends Tool {
   constructor(candidateConfig: CandidateConfig) {
     super(
       `get_resume_url`,
+      `Get the resume URL of the candidate ${candidateConfig.name}`,
       {},
       async (_args, _extra) => {
         return {
@@ -73,6 +79,7 @@ class GetLinkedinUrl extends Tool {
   constructor(candidateConfig: CandidateConfig) {
     super(
       `get_linkedin_url`,
+      `Get the LinkedIn URL of the candidate ${candidateConfig.name}`,
       {},
       async (_args, _extra) => {
         return {
@@ -89,6 +96,7 @@ class GetGithubUrl extends Tool {
   constructor(candidateConfig: CandidateConfig) {
     super(
       `get_github_url`,
+      `Get the GitHub URL of the candidate ${candidateConfig.name}`,
       {},
       async (_args, _extra) => {
         return {
@@ -105,6 +113,7 @@ class GetWebsiteUrl extends Tool {
   constructor(candidateConfig: CandidateConfig) {
     super(
       `get_website_url`,
+      `Get the website URL of the candidate ${candidateConfig.name}`,
       {},
       async (_args, _extra) => {
         return {
@@ -121,6 +130,7 @@ class GetWebsiteText extends Tool {
   constructor(candidateConfig: CandidateConfig) {
     super(
       `get_website_text`,
+      `Get the website text of the candidate ${candidateConfig.name}`,
       {},
       async (_args, _extra) => {
         return {

@@ -1,12 +1,13 @@
 {
   "name": "@jhgaylor/candidate-mcp-server",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node examples/stdio.js",
+    "start": "node dist/stdio.js",
     "dev": "nodemon --watch src --ext ts --exec 'npm run build && npm start'",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm run build"
   },
   "author": "Jake Gaylor <jhgaylor@gmail.com>",
   "license": "MIT",
