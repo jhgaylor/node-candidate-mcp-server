@@ -2,6 +2,8 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ServerConfig, CandidateConfig } from "./config";
 import { candidateResources } from "./resources";
 import { candidateTools } from "./tools";
+import { candidatePrompts } from "./prompts";
+import { interviewTools } from "./tools/interviewTools";
 
 // Return a new instance of an MCP server
 function createServer(
@@ -17,6 +19,8 @@ function createServer(
   // Bind all available candidate tools + resources based on candidate configuration
   const resourceInstances = candidateResources(candidateConfig);
   const toolInstances = candidateTools(candidateConfig, serverConfig);
+  const promptInstances = candidatePrompts(candidateConfig);
+  const interviewToolInstances = interviewTools(candidateConfig);
   
   if (candidateConfig.resumeText) {
     resourceInstances.ResumeText.bind(server);
@@ -52,6 +56,19 @@ function createServer(
   if (serverConfig.contactEmail && serverConfig.mailgunApiKey && serverConfig.mailgunDomain) {
     toolInstances.ContactCandidate?.bind(server);
   }
+
+  // Bind all prompt templates
+  promptInstances.GetCandidateBackground.bind(server);
+  promptInstances.AssessTechProficiency.bind(server);
+  promptInstances.GeneratePhoneScreen.bind(server);
+  promptInstances.SummarizeCareerHighlights.bind(server);
+  promptInstances.EvaluateJobFit.bind(server);
+  promptInstances.AssessProductCollaboration.bind(server);
+  promptInstances.AssessStartupFit.bind(server);
+  
+  // Bind interview tools
+  interviewToolInstances.GenerateInterviewQuestions.bind(server);
+  interviewToolInstances.AssessRoleFit.bind(server);
 
   return server;
 }

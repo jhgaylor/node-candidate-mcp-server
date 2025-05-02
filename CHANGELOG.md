@@ -1,3 +1,7 @@
+# 1.2.1
+
+# add some experimental new toolds
+
 # 1.2.0
 
 - Add the ability to contact the candidate via email
