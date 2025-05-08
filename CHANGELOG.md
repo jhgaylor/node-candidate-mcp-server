@@ -1,6 +1,10 @@
+# 1.3.0
+
+- Add the ability to bindto a specific mcp server object rather than creating a new server
+
 # 1.2.1
 
-# add some experimental new toolds
+- add some experimental new toolds
 
 # 1.2.0
 

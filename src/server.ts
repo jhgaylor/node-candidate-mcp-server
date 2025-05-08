@@ -16,6 +16,10 @@ function createServer(
     version: serverConfig.version,
   });
 
+  return bindToServer(server, serverConfig, candidateConfig);
+}
+
+function bindToServer(server: McpServer, serverConfig: ServerConfig, candidateConfig: CandidateConfig) {
   // Bind all available candidate tools + resources based on candidate configuration
   const resourceInstances = candidateResources(candidateConfig);
   const toolInstances = candidateTools(candidateConfig, serverConfig);
@@ -73,4 +77,4 @@ function createServer(
   return server;
 }
 
-export { createServer };
+export { createServer, bindToServer };
