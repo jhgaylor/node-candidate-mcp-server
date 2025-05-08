@@ -1,8 +1,11 @@
 import { CandidateConfig, ServerConfig } from "../config";
 import { Tool } from "./types";
 import * as nodemailer from 'nodemailer';
-import mailGun from 'nodemailer-mailgun-transport';
+import { MailgunTransport } from 'mailgun-nodemailer-transport';
+
+
 import { z } from "zod";
+
 // Define a type for the tools collection
 interface CandidateToolCollection {
   GetResumeText: GetResumeText;
@@ -42,14 +45,12 @@ class ContactCandidate extends Tool {
       },
       async (args, _extra) => {
         try {
-          const auth = {
+          const transporter = nodemailer.createTransport(new MailgunTransport({
             auth: {
-              api_key: serverConfig.mailgunApiKey!,
-              domain: serverConfig.mailgunDomain!
+              domain: serverConfig.mailgunDomain!,
+              apiKey: serverConfig.mailgunApiKey!
             }
-          };
-
-          const transporter = nodemailer.createTransport(mailGun(auth));
+          }));
           
           const mailOptions = {
             from: `AI Assistant <ai-assistant@${serverConfig.mailgunDomain}>`,

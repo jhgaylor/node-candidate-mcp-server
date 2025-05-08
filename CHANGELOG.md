@@ -1,3 +1,7 @@
+# 1.3.1
+
+- Replace the mailgun transport with a more modern package
+
 # 1.3.0
 
 - Add the ability to bindto a specific mcp server object rather than creating a new server
