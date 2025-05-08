@@ -1,4 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { ServerCapabilities } from "@modelcontextprotocol/sdk/types.js";
 import { ServerConfig, CandidateConfig } from "./config";
 import { candidateResources } from "./resources";
 import { candidateTools } from "./tools";
@@ -13,6 +14,7 @@ function createServer(
 
   const server = new McpServer({
     name: serverConfig.name,
+    capabilities: getServerCapabilities(),
     version: serverConfig.version,
   });
 
@@ -77,4 +79,12 @@ function bindToServer(server: McpServer, serverConfig: ServerConfig, candidateCo
   return server;
 }
 
-export { createServer, bindToServer };
+function getServerCapabilities() {
+  return {
+    resources: {},
+    tools: {},
+    prompts: {},
+  };
+}
+
+export { createServer, bindToServer, getServerCapabilities };

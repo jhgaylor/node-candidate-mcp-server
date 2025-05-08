@@ -1,3 +1,7 @@
+# 1.3.2
+
+- Expose getServerCapabilities
+
 # 1.3.1
 
 - Replace the mailgun transport with a more modern package

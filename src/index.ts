@@ -1,4 +1,4 @@
-import { createServer, bindToServer } from "./server";
+import { createServer, bindToServer, getServerCapabilities } from "./server";
 import { CandidateConfig, ServerConfig } from "./config";
 import { candidatePrompts } from "./prompts";
 import { interviewTools } from "./tools/interviewTools";
@@ -9,5 +9,6 @@ export {
   CandidateConfig, 
   ServerConfig,
   candidatePrompts,
-  interviewTools
+  interviewTools,
+  getServerCapabilities
 };
