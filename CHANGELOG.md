@@ -1,3 +1,7 @@
+# 1.3.3
+
+- Add constructors for the config objects
+
 # 1.3.2
 
 - Expose getServerCapabilities
