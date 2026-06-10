@@ -45,15 +45,25 @@ class ContactCandidate extends Tool {
       },
       async (args, _extra) => {
         try {
-          const transporter = nodemailer.createTransport(new MailgunTransport({
-            auth: {
-              domain: serverConfig.mailgunDomain!,
-              apiKey: serverConfig.mailgunApiKey!
-            }
-          }));
-          
+          const transporter = serverConfig.smtpHost
+            ? nodemailer.createTransport({
+                host: serverConfig.smtpHost,
+                port: serverConfig.smtpPort ?? 465,
+                secure: (serverConfig.smtpPort ?? 465) === 465,
+                auth: serverConfig.smtpUser ? {
+                  user: serverConfig.smtpUser,
+                  pass: serverConfig.smtpPass
+                } : undefined
+              })
+            : nodemailer.createTransport(new MailgunTransport({
+                auth: {
+                  domain: serverConfig.mailgunDomain!,
+                  apiKey: serverConfig.mailgunApiKey!
+                }
+              }));
+
           const mailOptions = {
-            from: `AI Assistant <ai-assistant@${serverConfig.mailgunDomain}>`,
+            from: serverConfig.fromAddress || `AI Assistant <ai-assistant@${serverConfig.mailgunDomain}>`,
             to: serverConfig.contactEmail!,
             subject: args.subject,
             text: args.message,

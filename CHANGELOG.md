@@ -1,3 +1,7 @@
+# 1.4.0
+
+- Add generic SMTP transport support (smtpHost/smtpPort/smtpUser/smtpPass/fromAddress on ServerConfig) so providers like Resend work; smtpHost takes precedence over Mailgun
+
 # 1.3.3
 
 - Add constructors for the config objects
