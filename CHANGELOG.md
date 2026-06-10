@@ -1,3 +1,7 @@
+# 1.4.1
+
+- Bind the contact_candidate tool when SMTP is configured (previously it only bound with Mailgun config, so the 1.4.0 SMTP transport was unreachable)
+
 # 1.4.0
 
 - Add generic SMTP transport support (smtpHost/smtpPort/smtpUser/smtpPass/fromAddress on ServerConfig) so providers like Resend work; smtpHost takes precedence over Mailgun

@@ -58,8 +58,11 @@ function bindToServer(server: McpServer, serverConfig: ServerConfig, candidateCo
     toolInstances.GetWebsiteText.bind(server);
   }
   
-  // Conditionally bind ContactCandidate tool if email and Mailgun config are available
-  if (serverConfig.contactEmail && serverConfig.mailgunApiKey && serverConfig.mailgunDomain) {
+  // Conditionally bind ContactCandidate tool when a usable mail transport is
+  // configured — either SMTP (smtpHost) or Mailgun (apiKey + domain).
+  const hasSmtp = !!serverConfig.smtpHost;
+  const hasMailgun = !!(serverConfig.mailgunApiKey && serverConfig.mailgunDomain);
+  if (serverConfig.contactEmail && (hasSmtp || hasMailgun)) {
     toolInstances.ContactCandidate?.bind(server);
   }
 
